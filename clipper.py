@@ -9,9 +9,9 @@ from moviepy.editor import *
 
 ap = argparse.ArgumentParser()
 # required
-ap.add_argument("inputFile", type=str, help="input file path")
-ap.add_argument("srtFile", type=str, help="srt file path")
-ap.add_argument("dialogue", type=str, help="dialogue to match in srt file, comma separate multiple")
+ap.add_argument("inputFile", type=str, help="Input video file path.")
+ap.add_argument("srtFile", type=str, help="SRT file path.")
+ap.add_argument("dialogue", type=str, help="Dialogue to match in srt file.")
 # optional
 ap.add_argument("-w", "--window-slide", type=int, help="Time in seconds to move start/end times. Use a negative number to slide backwards.")
 ap.add_argument("-p", "--window-pad", type=int, help="Time in seconds to pad the window. Use a negative number to shrink.")
