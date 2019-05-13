@@ -81,7 +81,7 @@ for sub in matches:
     if len(args.dialogue) != len(re.sub(r'\W+', '', sub.content)):
       ps, pe = calc_window_prediction(sub, args.dialogue)
       window = {'start': ps, 'end': pe}
-      print(f'Predicted window is: {window}')
+      print(f'Predicted window is: ' + str(window['start']) + ' --> ' + str(window['end']))
   
   if args.window_slide is not None:
     d = timedelta(seconds=args.window_slide)
@@ -100,7 +100,8 @@ for sub in matches:
     print('Window end was less than 0. Try adjusting.')
     raise
 
-  print(f'Final window is: {window}')
+  print(f'Final window is: ' + str(window['start']) + ' --> ' + str(window['end']))
+  
   clip = VideoFileClip(f'{args.inputFile}', verbose=True)
   clip = clip.subclip(str(window['start']), str(window['end']))
   
