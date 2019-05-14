@@ -11,12 +11,13 @@ ap = argparse.ArgumentParser()
 # required
 ap.add_argument("inputFile", type=str, help="Input video file path.")
 ap.add_argument("srtFile", type=str, help="SRT file path.")
-ap.add_argument("dialogue", type=str, help="Dialogue to match in srt file.")
+ap.add_argument("pattern", type=str, help="Pattern to match in srt file. Can be regex.")
 # optional
 ap.add_argument("-w", "--window-slide", type=int, help="Time in seconds to move start/end times. Use a negative number to slide backwards.")
 ap.add_argument("-p", "--window-pad", type=int, help="Time in seconds to pad the window. Use a negative number to shrink.")
-ap.add_argument("-P", "--predict-window", action="store_true", help="Predict the window based on the subtitle content and the position of the matching dialogue.")
+ap.add_argument("-P", "--predict-window", action="store_true", help="Predict the window based on the subtitle content and the position of the matching pattern.")
 ap.add_argument("-A", "--audio-only", action="store_true", help="Export audio only.")
+ap.add_argument("-C", "--case-sensitive", action="store_true", help="Use case sensitive matching. Defaults to case insensitive.")
 ap.add_argument("-m", "--mode", type=str, default='first', help="How to handle multiple matches - specify 'First','All', or 'Interactive'. Default is 'First'.")
 # required
 ap.add_argument("outputFile", type=str, help="Output file path. When using 'All' or 'Interactive' modes, place an asterisk in the path to be replaced with the clip number.")
@@ -26,12 +27,12 @@ srtFile = open(args.srtFile)
 
 subs = srt.parse(srtFile)
 
-def calc_window_prediction(sub, dialogue):
+def calc_window_prediction(sub, pattern):
   ls = len(sub.content)
-  ld = len(dialogue)
+  ld = len(pattern)
 
   ss = sub.end.total_seconds() - sub.start.total_seconds()
-  i = sub.content.lower().index(dialogue.lower())
+  i = sub.content.index(pattern)
 
   # offsets
   so = (i / ls) * ss
@@ -42,27 +43,44 @@ def calc_window_prediction(sub, dialogue):
 
 matches = []
 
+if not args.case_sensitive:
+  args.pattern = args.pattern.lower()
+
 for sub in subs:
-  if args.dialogue.lower() in sub.content.lower():
+  sub.matchIndexes = []
+
+  if not args.case_sensitive:
+    sub.content = sub.content.lower()
+
+  for m in re.finditer(re.compile(args.pattern), sub.content):
+    sub.matchIndexes.append((m.start(), m.end()))
+
+  if len(sub.matchIndexes) > 0:
     matches.append(sub)
 
 if len(matches) > 1:
   if args.mode is None or args.mode.lower() == 'first':
-    matches = matches[0]
+    matches = [matches[0]]
+
   if args.mode.lower() == 'interactive':
     cprint('Found matches:', 'cyan')
     cprint('---------------------', attrs=['bold'])
 
     for i in range(len(matches)):
       sub = matches[i]
-      di = sub.content.lower().index(args.dialogue.lower())
 
       line = colored(f'[{i}]', 'cyan') + ' ' \
            + str(sub.start) + colored(' --> ', 'cyan') + str(sub.end) \
-           + os.linesep \
-           + sub.content[:di] \
-           + colored(args.dialogue, 'red') \
-           + sub.content[di + len(args.dialogue):]
+           + os.linesep
+      
+      for i in range(len(sub.content)):
+        for mi in sub.matchIndexes:
+          if i in range(mi[0], mi[1]):
+            line += colored(sub.content[i], 'red')
+            break
+          else:
+            if sub.matchIndexes.index(mi) == len(sub.matchIndexes)-1:
+              line += sub.content[i]
 
       print(line)
       cprint('---------------------', attrs=['bold'])
@@ -70,18 +88,25 @@ if len(matches) > 1:
     selected = input('Specify selected matches as a comma separated list: ').split(',')
 
     matches = [matches[int(i)] for i in selected]
+else:
+  print('No matches found.')
+  exit()
 
 for sub in matches:
   # the default for the window is to match the subtitle display
   window = {'start': sub.start, 'end': sub.end}
 
   if args.predict_window:
-    print('Using predictive window')
-    # if raw sub content is not same length as dialogue
-    if len(args.dialogue) != len(re.sub(r'\W+', '', sub.content)):
-      ps, pe = calc_window_prediction(sub, args.dialogue)
-      window = {'start': ps, 'end': pe}
-      print(f'Predicted window is: ' + str(window['start']) + ' --> ' + str(window['end']))
+    if len(sub.matchIndexes) == 1:
+      print('Using predictive window')
+
+      # if raw sub content is not same length as pattern
+      if len(args.pattern) != len(re.sub(r'\W+', '', sub.content)):
+        ps, pe = calc_window_prediction(sub, args.pattern)
+        window = {'start': ps, 'end': pe}
+        print(f'Predicted window is: ' + str(window['start']) + ' --> ' + str(window['end']))
+    else:
+      print('Multiple matches in sub content found. Using default window.')
   
   if args.window_slide is not None:
     d = timedelta(seconds=args.window_slide)

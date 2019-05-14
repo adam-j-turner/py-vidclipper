@@ -5,13 +5,14 @@ Python script to clip video (and audio from video) by matching dialogue from a s
 
 ### Usage
 ```
-usage: clipper.py [-h] [-w WINDOW_SLIDE] [-p WINDOW_PAD] [-P] [-A] [-m MODE]
-                  inputFile srtFile dialogue outputFile
+usage: clipper.py [-h] [-w WINDOW_SLIDE] [-p WINDOW_PAD] [-P] [-A] [-C]
+                  [-m MODE]
+                  inputFile srtFile pattern outputFile
 
 positional arguments:
   inputFile             Input video file path.
   srtFile               SRT file path.
-  dialogue              Dialogue to match in srt file.
+  pattern               Pattern to match in srt file. Can be regex.
   outputFile            Output file path. When using 'All' or 'Interactive'
                         modes, place an asterisk in the path to be replaced
                         with the clip number.
@@ -25,10 +26,12 @@ optional arguments:
                         Time in seconds to pad the window. Use a negative
                         number to shrink.
   -P, --predict-window  Predict the window based on the subtitle content and
-                        the position of the matching dialogue.
+                        the position of the matching pattern.
   -A, --audio-only      Export audio only.
+  -C, --case-sensitive  Use case sensitive matching. Defaults to case
+                        insensitive.
   -m MODE, --mode MODE  How to handle multiple matches - specify
-                        'First','All', or 'Interactive'. Default is 'First'
+                        'First','All', or 'Interactive'. Default is 'First'.
 ```
 
 ### Example
