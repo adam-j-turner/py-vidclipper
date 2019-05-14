@@ -17,7 +17,7 @@ ap.add_argument("-w", "--window-slide", type=int, help="Time in seconds to move 
 ap.add_argument("-p", "--window-pad", type=int, help="Time in seconds to pad the window. Use a negative number to shrink.")
 ap.add_argument("-P", "--predict-window", action="store_true", help="Predict the window based on the subtitle content and the position of the matching dialogue.")
 ap.add_argument("-A", "--audio-only", action="store_true", help="Export audio only.")
-ap.add_argument("-m", "--mode", type=str, help="How to handle multiple matches - specify 'First','All', or 'Interactive'. Default is 'First'.")
+ap.add_argument("-m", "--mode", type=str, default='first' help="How to handle multiple matches - specify 'First','All', or 'Interactive'. Default is 'First'.")
 # required
 ap.add_argument("outputFile", type=str, help="Output file path. When using 'All' or 'Interactive' modes, place an asterisk in the path to be replaced with the clip number.")
 args = ap.parse_args()
