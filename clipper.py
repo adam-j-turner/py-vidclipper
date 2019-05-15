@@ -109,30 +109,30 @@ if len(matches) >= 1:
         for i in range(len(matches)):
             sub = matches[i]
 
-        line = (
-            colored(f'[{i}]', 'cyan')
-            + ' '
-            + str(sub.start)
-            + colored(' --> ', 'cyan')
-            + str(sub.end)
-            +os.linesep
-        )
+            line = (
+                colored(f'[{i}]', 'cyan')
+                + ' '
+                + str(sub.start)
+                + colored(' --> ', 'cyan')
+                + str(sub.end)
+                +os.linesep
+            )
 
-        for i in range(len(sub.content)):
-            for mi in sub.matchIndexes:
-                if i in range(mi[0], mi[1]):
-                    line += colored(sub.content[i], 'red')
-                break
-            else:
-                if sub.matchIndexes.index(mi) == len(sub.matchIndexes)-1:
-                    line += sub.content[i]
+            for i in range(len(sub.content)):
+                for mi in sub.matchIndexes:
+                    if i in range(mi[0], mi[1]):
+                        line += colored(sub.content[i], 'red')
+                    break
+                else:
+                    if sub.matchIndexes.index(mi) == len(sub.matchIndexes)-1:
+                        line += sub.content[i]
 
-        print(line)
-        cprint('---------------------', attrs=['bold'])
+            print(line)
+            cprint('---------------------', attrs=['bold'])
 
-    selected = input(
-        'Specify selected matches as a comma separated list: '
-    ).split(',')
+        selected = input(
+            'Specify selected matches as a comma separated list: '
+        ).split(',')
 
 if len(matches) >= 1:
   if args.mode is None or args.mode.lower() == 'first':
@@ -215,7 +215,7 @@ for sub in matches:
         + str(window['end'])
     )
 
-    clip = VideoFileClip(f'{args.inputFile}', verbose=True)
+    clip = VideoFileClip(args.inputFile, verbose=True)
     clip = clip.subclip(str(window['start']), str(window['end']))
 
     if args.mode.lower() in ['interactive','all']:
@@ -224,8 +224,8 @@ for sub in matches:
         outputFile = args.outputFile
 
     if args.audio_only:
-        clip.audio.write_audiofile(f'{outputFile}', codec='pcm_s32le')
+        clip.audio.write_audiofile(outputFile, codec='pcm_s32le')
     else:
-        clip.write_videofile(f'{outputFile}', codec='libx264')
+        clip.write_videofile(outputFile, codec='libx264')
 
 srtFile.close()
