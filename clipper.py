@@ -13,8 +13,8 @@ ap.add_argument("inputFile", type=str, help="Input video file path.")
 ap.add_argument("srtFile", type=str, help="SRT file path.")
 ap.add_argument("pattern", type=str, help="Pattern to match in srt file. Can be regex.")
 # optional
-ap.add_argument("-w", "--window-slide", type=int, help="Time in seconds to move start/end times. Use a negative number to slide backwards.")
-ap.add_argument("-p", "--window-pad", type=int, help="Time in seconds to pad the window. Use a negative number to shrink.")
+ap.add_argument("-w", "--window-slide", type=float, help="Time in seconds to move start/end times. Use a negative number to slide backwards.")
+ap.add_argument("-p", "--window-pad", type=float, help="Time in seconds to pad the window. Use a negative number to shrink.")
 ap.add_argument("-P", "--predict-window", action="store_true", help="Predict the window based on the subtitle content and the position of the matching pattern.")
 ap.add_argument("-A", "--audio-only", action="store_true", help="Export audio only.")
 ap.add_argument("-C", "--case-sensitive", action="store_true", help="Use case sensitive matching. Defaults to case insensitive.")
@@ -58,7 +58,7 @@ for sub in subs:
   if len(sub.matchIndexes) > 0:
     matches.append(sub)
 
-if len(matches) > 1:
+if len(matches) >= 1:
   if args.mode is None or args.mode.lower() == 'first':
     matches = [matches[0]]
 
