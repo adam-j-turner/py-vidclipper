@@ -122,7 +122,7 @@ if len(matches) >= 1:
                 for mi in sub.matchIndexes:
                     if i in range(mi[0], mi[1]):
                         line += colored(sub.content[i], 'red')
-                    break
+                        break
                 else:
                     if sub.matchIndexes.index(mi) == len(sub.matchIndexes)-1:
                         line += sub.content[i]
