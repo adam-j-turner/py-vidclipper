@@ -23,7 +23,7 @@ ap.add_argument("-m", "--mode", type=str, default='first', help="How to handle m
 ap.add_argument("outputFile", type=str, help="Output file path. When using 'All' or 'Interactive' modes, place an asterisk in the path to be replaced with the clip number.")
 args = ap.parse_args()
 
-srtFile = open(args.srtFile)
+srtFile = open(args.srtFile, encoding='utf-8-sig')
 
 subs = srt.parse(srtFile)
 
