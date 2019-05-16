@@ -147,16 +147,16 @@ for sub in matches:
         if len(sub.matchIndexes) == 1:
             print('Using predictive window')
 
-        # if raw sub content is not same length as pattern
-        if len(args.pattern) != len(re.sub(r'\W+', '', sub.content)):
-            ps, pe = calc_window_prediction(sub, args.pattern)
-            window = {'start': ps, 'end': pe}
-            print(
-                f'Predicted window is: '
-                + str(window['start'])
-                + ' --> '
-                + str(window['end'])
-            )
+            # if raw sub content is not same length as pattern
+            if len(args.pattern) != len(re.sub(r'\W+', '', sub.content)):
+                ps, pe = calc_window_prediction(sub, args.pattern)
+                window = {'start': ps, 'end': pe}
+                print(
+                    f'Predicted window is: '
+                    + str(window['start'])
+                    + ' --> '
+                    + str(window['end'])
+                )
         else:
             print(
                 'Multiple matches in sub content found. Using default window.'
